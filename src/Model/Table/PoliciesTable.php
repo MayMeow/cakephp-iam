@@ -10,6 +10,7 @@ use Cake\Validation\Validator;
 
 /**
  * Policies Model
+ * @property \Iam\Model\Table\RolesTable&\Cake\ORM\Association\BelongsToMany $Roles
  *
  * @method \Iam\Model\Entity\Policy newEmptyEntity()
  * @method \Iam\Model\Entity\Policy newEntity(array $data, array $options = [])
@@ -42,6 +43,13 @@ class PoliciesTable extends Table
         $this->setPrimaryKey('id');
         $this->addBehavior('Tools.Normalization', [
             'preserve' => ':/'
+        ]);
+
+        $this->belongsToMany('Roles', [
+            'className' => 'Iam.Roles',
+            'foreignKey' => 'policy_id',
+            'targetForeignKey' => 'role_id',
+            'joinTable' => 'iam_policies_roles'
         ]);
     }
 

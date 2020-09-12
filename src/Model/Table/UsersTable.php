@@ -12,6 +12,7 @@ use Cake\Validation\Validator;
  * Users Model
  *
  * @property \Iam\Model\Table\GroupsTable&\Cake\ORM\Association\BelongsTo $Groups
+ * @property \Iam\Model\Table\RolesTable&\Cake\ORM\Association\BelongsToMany $Roles
  *
  * @method \Iam\Model\Entity\User newEmptyEntity()
  * @method \Iam\Model\Entity\User newEntity(array $data, array $options = [])
@@ -52,6 +53,13 @@ class UsersTable extends Table
             'joinType' => 'INNER',
             'className' => 'Iam.Groups',
         ]);
+
+        $this->belongsToMany('Roles', [
+            'className' => 'Iam.Roles',
+            'foreignKey' => 'user_id',
+            'targetForeignKey' => 'role_id',
+            'joinTable' => 'iam_roles_users'
+        ])
     }
 
     /**

@@ -10,6 +10,9 @@ use Cake\Validation\Validator;
 
 /**
  * Roles Model
+ * 
+ * @property \Iam\Model\Table\UsersTable&\Cake\ORM\Association\BelongsToMany $Users
+ * @property \Iam\Model\Table\PoliciesTable&\Cake\ORM\Association\BelongsToMany $Policies
  *
  * @method \Iam\Model\Entity\Role newEmptyEntity()
  * @method \Iam\Model\Entity\Role newEntity(array $data, array $options = [])
@@ -43,6 +46,20 @@ class RolesTable extends Table
 
         $this->addBehavior('Tools.Normalization');
         $this->addBehavior('Tools.HasUuid');
+
+        $this->belongsToMany('Users', [
+            'className' => 'Iam.Users',
+            'foreignKey' => 'role_id',
+            'targetForeignKey' => 'user_id',
+            'joinTable' => 'iam_roles_users'
+        ]);
+
+        $this->belongsToMany('Policies', [
+            'className' => 'Iam.Policies',
+            'foreignKey' => 'role_id',
+            'targetForeignKey' => 'policy_id',
+            'joinTable' => 'iam_policies_roles'
+        ]);
     }
 
     /**
