@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Migrations\AbstractMigration;
 
-class CreateUsers extends AbstractMigration
+class CreateRoles extends AbstractMigration
 {
     /**
      * Change Method.
@@ -14,22 +14,22 @@ class CreateUsers extends AbstractMigration
      */
     public function change()
     {
-        $table = $this->table('iam_users');
-        $table->addColumn('email', 'string', [
+        $table = $this->table('iam_roles');
+        $table->addColumn('name', 'string', [
             'default' => null,
             'limit' => 255,
             'null' => false,
         ]);
-        $table->addColumn('password', 'string', [
+        $table->addColumn('normalized_name', 'string', [
             'default' => null,
             'limit' => 255,
             'null' => false,
         ]);
-        $table->addColumn('created', 'datetime', [
+        $table->addColumn('description', 'text', [
             'default' => null,
             'null' => false,
         ]);
-        $table->addColumn('modified', 'datetime', [
+        $table->addColumn('uuid', 'uuid', [
             'default' => null,
             'null' => false,
         ]);
