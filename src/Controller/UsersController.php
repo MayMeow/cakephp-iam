@@ -50,6 +50,8 @@ class UsersController extends AppController
             'contain' => ['Groups'],
         ]);
 
+        $this->Authorization->authorize($user);
+
         $roles = $user->getPolicies();
         $isAdmin = $user->isAdmin;
 
@@ -63,6 +65,8 @@ class UsersController extends AppController
      */
     public function add()
     {
+        $this->Authorization->skipAuthorization();
+
         $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
@@ -89,6 +93,8 @@ class UsersController extends AppController
         $user = $this->Users->get($id, [
             'contain' => [],
         ]);
+        $this->Authorization->authorize($user);
+
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
             if ($this->Users->save($user)) {
@@ -124,6 +130,8 @@ class UsersController extends AppController
 
     public function login()
     {
+        $this->Authorization->skipAuthorization();
+
         $this->request->allowMethod(['get', 'post']);
         $result = $this->Authentication->getResult();
 
@@ -144,6 +152,8 @@ class UsersController extends AppController
 
     public function logout()
     {
+        $this->Authorization->skipAuthorization();
+
         $result = $this->Authentication->getResult();
         // regardless of POST or GET, redirect if user is logged in
         if ($result->isValid()) {

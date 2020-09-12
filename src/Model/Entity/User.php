@@ -77,7 +77,7 @@ class User extends Entity
 
     protected function _getIsAdmin() : bool
     {
-        return true;
+        return false;
     }
 
     protected function _setPassword(string $password) : ?string
