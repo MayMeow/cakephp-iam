@@ -40,6 +40,9 @@ class PoliciesTable extends Table
         $this->setTable('iam_policies');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
+        $this->addBehavior('Tools.Normalization', [
+            'preserve' => ':/'
+        ]);
     }
 
     /**
@@ -63,7 +66,7 @@ class PoliciesTable extends Table
         $validator
             ->scalar('normalized_name')
             ->maxLength('normalized_name', 255)
-            ->requirePresence('normalized_name', 'create')
+            // ->requirePresence('normalized_name', 'create')
             ->notEmptyString('normalized_name');
 
         $validator

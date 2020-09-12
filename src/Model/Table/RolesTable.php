@@ -40,6 +40,9 @@ class RolesTable extends Table
         $this->setTable('iam_roles');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Tools.Normalization');
+        $this->addBehavior('Tools.HasUuid');
     }
 
     /**
@@ -63,7 +66,8 @@ class RolesTable extends Table
         $validator
             ->scalar('normalized_name')
             ->maxLength('normalized_name', 255)
-            ->requirePresence('normalized_name', 'create')
+            // ->requirePresence('normalized_name', 'create')
+            ->allowEmptyString('normalized_name', null, false)
             ->notEmptyString('normalized_name');
 
         $validator
@@ -73,7 +77,7 @@ class RolesTable extends Table
 
         $validator
             ->uuid('uuid')
-            ->requirePresence('uuid', 'create')
+            // ->requirePresence('uuid', 'create')
             ->notEmptyString('uuid');
 
         return $validator;

@@ -40,6 +40,8 @@ class GroupsTable extends Table
         $this->setTable('iam_groups');
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Tools.Normalization');
     }
 
     /**

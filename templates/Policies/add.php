@@ -18,7 +18,7 @@
                 <legend><?= __('Add Policy') ?></legend>
                 <?php
                     echo $this->Form->control('name');
-                    echo $this->Form->control('normalized_name');
+                    // echo $this->Form->control('normalized_name');
                     echo $this->Form->control('description');
                 ?>
             </fieldset>

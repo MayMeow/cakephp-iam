@@ -18,9 +18,9 @@
                 <legend><?= __('Add Role') ?></legend>
                 <?php
                     echo $this->Form->control('name');
-                    echo $this->Form->control('normalized_name');
+                    // echo $this->Form->control('normalized_name');
                     echo $this->Form->control('description');
-                    echo $this->Form->control('uuid');
+                    // echo $this->Form->control('uuid');
                 ?>
             </fieldset>
             <?= $this->Form->button(__('Submit')) ?>
