@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Model\Entity;
 
+use Authentication\PasswordHasher\DefaultPasswordHasher;
 use Cake\ORM\Entity;
 use Cake\ORM\TableRegistry;
 
@@ -72,5 +73,17 @@ class User extends Entity
             });
 
         return $policies;
+    }
+
+    protected function _getIsAdmin() : bool
+    {
+        return true;
+    }
+
+    protected function _setPassword(string $password) : ?string
+    {
+        if (strlen($password) > 0) {
+            return (new DefaultPasswordHasher())->hash($password);
+        }
     }
 }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
 
 /**
@@ -13,6 +14,14 @@ use Iam\Controller\AppController;
  */
 class UsersController extends AppController
 {
+
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        
+        $this->Authentication->addUnauthenticatedActions(['login', 'add']);
+    }
+
     /**
      * Index method
      *
@@ -42,8 +51,9 @@ class UsersController extends AppController
         ]);
 
         $roles = $user->getPolicies();
+        $isAdmin = $user->isAdmin;
 
-        $this->set(compact('user', 'roles'));
+        $this->set(compact('user', 'roles', 'isAdmin'));
     }
 
     /**
@@ -110,5 +120,35 @@ class UsersController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function login()
+    {
+        $this->request->allowMethod(['get', 'post']);
+        $result = $this->Authentication->getResult();
+
+        if ($result->isValid()) {
+            $redirect = $this->request->getQuery('redirect', [
+                'controller' => 'Users',
+                'action' => 'index',
+                'plugin' => 'Iam'
+            ]);
+
+            return $this->redirect($redirect);
+        }
+
+        if ($this->request->is('post') && !$result->isValid()) {
+            $this->Flash->error(__('Invalid username or password'));
+        }
+    }
+
+    public function logout()
+    {
+        $result = $this->Authentication->getResult();
+        // regardless of POST or GET, redirect if user is logged in
+        if ($result->isValid()) {
+            $this->Authentication->logout();
+            return $this->redirect(['controller' => 'Users', 'action' => 'login']);
+        }
     }
 }
