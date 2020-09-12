@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Iam\Model\Entity;
 
 use Cake\ORM\Entity;
+use Cake\ORM\TableRegistry;
 
 /**
  * User Entity
@@ -49,4 +50,27 @@ class User extends Entity
     protected $_hidden = [
         'password',
     ];
+
+    // Returns all user policies
+    public function getPolicies()
+    {
+        $id = $this->id;
+
+        $rolesTable = TableRegistry::getTableLocator()->get('Iam.Roles');
+        $policiesTable = TableRegistry::getTableLocator()->get('Iam.Policies');
+
+        // Find all users roles
+        $roles = $rolesTable->find('list')->select(['Roles.id'])
+            ->matching('Users', function($q) use($id) {
+                return $q->where(['Users.id' => $id]);
+            })->toArray();
+
+        // Find all users policies matching roles
+        $policies = $policiesTable->find()
+            ->matching('Roles', function($q) use ($roles) {
+                return $q->where(['Roles.id IN' => array_keys($roles)]);
+            });
+
+        return $policies;
+    }
 }

@@ -59,7 +59,7 @@ class UsersTable extends Table
             'foreignKey' => 'user_id',
             'targetForeignKey' => 'role_id',
             'joinTable' => 'iam_roles_users'
-        ])
+        ]);
     }
 
     /**

@@ -41,7 +41,9 @@ class UsersController extends AppController
             'contain' => ['Groups'],
         ]);
 
-        $this->set(compact('user'));
+        $roles = $user->getPolicies();
+
+        $this->set(compact('user', 'roles'));
     }
 
     /**
