@@ -29,10 +29,13 @@ class UsersController extends AppController
      */
     public function index()
     {
+        $allUsers = $this->Users;
+        $this->Authorization->authorize($allUsers); // Uses UserTablePolicy
+
         $this->paginate = [
             'contain' => ['Groups'],
         ];
-        $users = $this->paginate($this->Users);
+        $users = $this->paginate($allUsers);
 
         $this->set(compact('users'));
     }
@@ -50,7 +53,7 @@ class UsersController extends AppController
             'contain' => ['Groups'],
         ]);
 
-        $this->Authorization->authorize($user);
+        $this->Authorization->authorize($user); // Uses UserEntityPolicy
 
         $roles = $user->getPolicies();
         $isAdmin = $user->isAdmin;
@@ -65,7 +68,7 @@ class UsersController extends AppController
      */
     public function add()
     {
-        $this->Authorization->skipAuthorization();
+        $this->Authorization->skipAuthorization(); // Do not check if user is authorized
 
         $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
