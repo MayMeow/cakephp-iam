@@ -10,7 +10,9 @@ use Authorization\IdentityInterface as AuthorizationIdentity;
 use Authentication\IdentityInterface as Authenticationidentity;
 use Authorization\Policy\ResultInterface;
 use Cake\ORM\Entity;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\TableRegistry;
+use phpDocumentor\Reflection\Types\This;
 
 /**
  * User Entity
@@ -23,11 +25,14 @@ use Cake\ORM\TableRegistry;
  * @property string $api_key
  * @property string $api_key_plain
  * @property int $group_id
+ * @property boolean $is_admin
  *
  * @property \Iam\Model\Entity\Group $group
  */
 class User extends Entity implements AuthorizationIdentity, Authenticationidentity
 {
+    use LocatorAwareTrait;
+
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
@@ -46,6 +51,7 @@ class User extends Entity implements AuthorizationIdentity, Authenticationidenti
         'api_key_plain' => true,
         'group_id' => true,
         'group' => true,
+        'is_admin' => true
     ];
 
     /**
@@ -112,8 +118,8 @@ class User extends Entity implements AuthorizationIdentity, Authenticationidenti
     {
         $id = $this->id;
 
-        $rolesTable = TableRegistry::getTableLocator()->get('Iam.Roles');
-        $policiesTable = TableRegistry::getTableLocator()->get('Iam.Policies');
+        $rolesTable = $this->getTableLocator()->get('Iam.Roles');
+        $policiesTable = $this->getTableLocator()->get('Iam.Policies');
 
         // Find all users roles
         $roles = $rolesTable->find('list')->select(['Roles.id'])
@@ -130,9 +136,49 @@ class User extends Entity implements AuthorizationIdentity, Authenticationidenti
         return $policies;
     }
 
-    protected function _getIsAdmin() : bool
+    public function hasPolicyTo(string $policy)
     {
-        return false; // TODO Implement this...
+        $id = $this->id;
+
+        $rolesTable = $this->getTableLocator()->get('Iam.Roles');
+        $policiesTable = $this->getTableLocator()->get('Iam.Policies');
+
+        // Find all users roles
+        $roles = $rolesTable->find('list')->select(['Roles.id'])
+            ->matching('Users', function($q) use($id) {
+                return $q->where(['Users.id' => $id]);
+            })->toArray();
+
+        if (empty($roles)) {
+            return false;
+        }
+
+        // Find all users policies matching roles
+        $policies = $policiesTable->find()
+            ->matching('Roles', function($q) use ($roles) {
+                return $q->where(['Roles.id IN' => array_keys($roles)]);
+            });
+        
+        return $policies;
+    }
+
+    public function isAdmin() : bool
+    {
+        // Check if user is super admin
+        if ($this->is_admin == true) {
+            return true;
+        }
+
+        $groupsTable = $this->getTableLocator()->get('Iam.Groups');
+
+        /** @var \Iam\Model\Entity\Group */
+        $group = $groupsTable->get($this->group_id);
+
+        if ($group->normalized_name == 'ADMINISTRATORS') {
+            return true;
+        }
+
+        return false;
     }
 
     protected function _setPassword(string $password) : ?string

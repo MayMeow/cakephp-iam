@@ -6,6 +6,7 @@ namespace Iam\Policy;
 use Authorization\IdentityInterface;
 use Authorization\Policy\Result;
 use Cake\Datasource\ResultSetInterface;
+use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Locator\TableLocator;
 use Cake\ORM\ResultSet;
 use Cake\ORM\TableRegistry;
@@ -16,6 +17,8 @@ use Iam\Model\Entity\User;
  */
 class UserPolicy
 {
+    use LocatorAwareTrait;
+
     /**
      * Check if $user can create User
      *
@@ -37,7 +40,7 @@ class UserPolicy
      */
     public function canUpdate(IdentityInterface $user, User $resource)
     {
-        return $this->isAdmin($user);
+        return $this->_getUser($user)->isAdmin();
     }
 
     /**
@@ -49,7 +52,7 @@ class UserPolicy
      */
     public function canEdit(IdentityInterface $user, User $resource)
     {
-        return $this->isAdmin($user);
+        return $this->_getUser($user)->isAdmin();
     }
 
     /**
@@ -61,7 +64,7 @@ class UserPolicy
      */
     public function canDelete(IdentityInterface $user, User $resource)
     {
-        return true;
+        return $this->_getUser($user)->isAdmin();
     }
 
     /**
@@ -73,19 +76,28 @@ class UserPolicy
      */
     public function canView(IdentityInterface $user, User $resource)
     {
-        return $this->isAdmin($user);
+        if ($this->_getUser($user)->isAdmin()) {
+            return true;
+        }
+
+        if ($this->_getUser($user)->hasPolicyTo('view:users')) {
+            return true;
+        }
+
+        return false;
     }
 
     /** 
      * @param \Authorization\IdentityInterface $user.
      */
-    protected function isAdmin(IdentityInterface $user)
+    protected function _getUser(IdentityInterface $user) : User
     {
-        $userTable = TableRegistry::getTableLocator()->get('Iam.Users');
+        $userTable = $this->getTableLocator()->get('Iam.Users');
 
         /** @var \Iam\Model\Entity\User */
         $u = $userTable->get($user->getIdentifier());
 
-        return $u->isAdmin;
+
+        return $u;
     }
 }

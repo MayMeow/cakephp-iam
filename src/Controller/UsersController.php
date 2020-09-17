@@ -35,7 +35,7 @@ class UsersController extends AppController
         $allUsers = $this->Users;
         
         // $this->_CurrentUser()->can('index', $allUsers);
-        //$this->Authorization->authorize($allUsers); // Uses UserTablePolicy
+        $this->Authorization->authorize($allUsers); // Uses UserTablePolicy
         //dd($this->request->getAttribute('identity')->can('index', $allUsers));
 
         $this->paginate = [
