@@ -3,7 +3,12 @@ declare(strict_types=1);
 
 namespace Iam\Model\Entity;
 
+use ArrayAccess;
 use Authentication\PasswordHasher\DefaultPasswordHasher;
+use Authorization\AuthorizationServiceInterface;
+use Authorization\IdentityInterface as AuthorizationIdentity;
+use Authentication\IdentityInterface as Authenticationidentity;
+use Authorization\Policy\ResultInterface;
 use Cake\ORM\Entity;
 use Cake\ORM\TableRegistry;
 
@@ -21,7 +26,7 @@ use Cake\ORM\TableRegistry;
  *
  * @property \Iam\Model\Entity\Group $group
  */
-class User extends Entity
+class User extends Entity implements AuthorizationIdentity, Authenticationidentity
 {
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
@@ -52,7 +57,57 @@ class User extends Entity
         'password',
     ];
 
-    // Returns all user policies
+    /**
+     * Authentication\IdentityInterface method
+     */
+    public function getIdentifier()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Authorization\IdentityInterface method
+     */
+    public function can($action, $resource) : bool
+    {
+        return $this->authorization->can($this, $action, $resource);
+    }
+
+    /**
+     * Authorization\IdentityInterface method
+     */
+    public function canResult($action, $resource): ResultInterface
+    {
+        return $this->authorization->canResult($this, $action, $resource);
+    }
+
+    /**
+     * Authorization\IdentityInterface method
+     */
+    public function applyScope($action, $resource)
+    {
+        return $this->authorization->applyScope($this, $action, $resource);
+    }
+
+    /**
+     * Authorization\IdentityInterface method
+     */
+    public function getOriginalData()
+    {
+        return $this;
+    }
+
+    /**
+     * Setter to be used by the middleware.
+     */
+    public function setAuthorization(AuthorizationServiceInterface $service)
+    {
+        $this->authorization = $service;
+
+        return $this;
+    }
+
+    // Returns all user's policies
     public function getPolicies()
     {
         $id = $this->id;
@@ -77,7 +132,7 @@ class User extends Entity
 
     protected function _getIsAdmin() : bool
     {
-        return false;
+        return false; // TODO Implement this...
     }
 
     protected function _setPassword(string $password) : ?string
