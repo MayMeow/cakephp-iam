@@ -3,8 +3,11 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Authorization\Exception\AuthorizationRequiredException;
+use Authorization\Exception\ForbiddenException;
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
+use Iam\Model\Entity\User;
 
 /**
  * Users Controller
@@ -28,9 +31,12 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function index()
-    {
+    {        
         $allUsers = $this->Users;
-        $this->Authorization->authorize($allUsers); // Uses UserTablePolicy
+        
+        // $this->_CurrentUser()->can('index', $allUsers);
+        //$this->Authorization->authorize($allUsers); // Uses UserTablePolicy
+        //dd($this->request->getAttribute('identity')->can('index', $allUsers));
 
         $this->paginate = [
             'contain' => ['Groups'],
@@ -53,7 +59,16 @@ class UsersController extends AppController
             'contain' => ['Groups'],
         ]);
 
-        $this->Authorization->authorize($user); // Uses UserEntityPolicy
+        //dd($this->request->getAttribute('identity')->can('view', $user));
+
+        // Try Authorize user and if fails redirect back to referer and show flash message instead of stack trace
+        try {
+            $this->Authorization->authorize($user); // Uses UserEntityPolicy
+        } catch (ForbiddenException $ex) {
+            $this->Flash->error($ex->getMessage());
+
+            return $this->redirect($this->referer());
+        }
 
         $roles = $user->getPolicies();
         $isAdmin = $user->isAdmin;
@@ -96,7 +111,14 @@ class UsersController extends AppController
         $user = $this->Users->get($id, [
             'contain' => [],
         ]);
-        $this->Authorization->authorize($user);
+        
+        try {
+            $this->Authorization->authorize($user); // Uses UserEntityPolicy
+        } catch (ForbiddenException $ex) {
+            $this->Flash->error($ex->getMessage());
+
+            return $this->redirect($this->referer());
+        }
 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
@@ -163,5 +185,13 @@ class UsersController extends AppController
             $this->Authentication->logout();
             return $this->redirect(['controller' => 'Users', 'action' => 'login']);
         }
+    }
+
+    /**
+     * Returns current authenticated user
+     */
+    private function _CurrentUser() : ?User
+    {
+        return $this->request->getAttribute('identity');
     }
 }
