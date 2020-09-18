@@ -14,6 +14,8 @@ use Iam\Model\Entity\User;
  *
  * @property \Iam\Model\Table\UsersTable $Users
  * @method \Iam\Model\Entity\User[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
+ * 
+ * @property \Iam\Service\UserManagerService $UserManager
  */
 class UsersController extends AppController
 {
@@ -23,6 +25,8 @@ class UsersController extends AppController
         parent::beforeFilter($event);
         
         $this->Authentication->addUnauthenticatedActions(['login', 'add']);
+
+        $this->loadService('Iam.UserManager');
     }
 
     /**
@@ -32,7 +36,7 @@ class UsersController extends AppController
      */
     public function index()
     {        
-        $allUsers = $this->Users;
+        $allUsers = $this->UserManager->getAll();
         
         // $this->_CurrentUser()->can('index', $allUsers);
         $this->Authorization->authorize($allUsers); // Uses UserTablePolicy
@@ -55,7 +59,7 @@ class UsersController extends AppController
      */
     public function view($id = null)
     {
-        $user = $this->Users->get($id, [
+        $user = $this->UserManager->showOne($id, [
             'contain' => ['Groups'],
         ]);
 
