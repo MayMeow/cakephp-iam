@@ -5,6 +5,7 @@ namespace Iam\Policy;
 
 use Authorization\IdentityInterface;
 use Authorization\Policy\Result;
+use Burzum\CakeServiceLayer\Service\ServiceAwareTrait;
 use Cake\Datasource\ResultSetInterface;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Locator\TableLocator;
@@ -14,10 +15,20 @@ use Iam\Model\Entity\User;
 
 /**
  * User policy
+ * 
+ * @property \Iam\Service\UserManagerServiceInterface $UserManager
+ * @property \Iam\Service\UserAuthorizationServiceInterface $UserAuthorization
  */
 class UserPolicy
 {
     use LocatorAwareTrait;
+    use ServiceAwareTrait;
+
+    public function __construct()
+    {
+        $this->loadService('Iam.UserManager');
+        $this->loadService('Iam.UserAuthorization');
+    }
 
     /**
      * Check if $user can create User
@@ -76,11 +87,12 @@ class UserPolicy
      */
     public function canView(IdentityInterface $user, User $resource)
     {
+        // TODO uncomment after DONE
         if ($this->_getUser($user)->isAdmin()) {
-            return true;
+            //return true;
         }
 
-        if ($this->_getUser($user)->hasPolicyTo('view:users')) {
+        if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), 'view:user')) {
             return true;
         }
 
@@ -92,11 +104,7 @@ class UserPolicy
      */
     protected function _getUser(IdentityInterface $user) : User
     {
-        $userTable = $this->getTableLocator()->get('Iam.Users');
-
-        /** @var \Iam\Model\Entity\User */
-        $u = $userTable->get($user->getIdentifier());
-
+        $u = $this->UserManager->get($user);
 
         return $u;
     }
