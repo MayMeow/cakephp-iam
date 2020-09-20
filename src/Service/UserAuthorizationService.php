@@ -23,19 +23,26 @@ class UserAuthorizationService extends AppService implements UserAuthorizationSe
     {
         $id = $user->getIdentifier();
 
-        $roles = $this->Roles->find('list')->select(['Roles.id'])
-            ->matching('Users', function($q) use($id) {
+        // That should give you all policies that match the given policy name and are associated with the roles of the given user
+        $policies = $this->Policies
+            ->find()
+            ->matching('Roles.Users', function($q) use($id) {
                 return $q->where(['Users.id' => $id]);
-            })->toArray();
-        
-        if (empty($roles)) {
-            return false;
-        }
+            })
+            ->where(['Policies.normalized_name' => $policy]);
 
-        $policies = $this->Policies->find('all')
-            ->matching('Roles', function ($q) use ($roles) {
-                return $q->where(['Roles.id IN' => array_keys($roles)]);
-            })->where(['Policies.normalized_name LIKE' => $policy]);
+
+        /*
+        That should give you the user with the given ID in case it has at least one policy matching the given policy name associated with its roles.
+        $userQuery = $this->Users
+            ->find()
+            ->matching('Roles.Policies', function($q) use($policy) {
+                return $q->where(['Policies.normalized_name LIKE' => $policy]);
+            })
+            ->where([
+                'Users.id' => $id,
+            ]);
+        */
 
         if (empty($policies->first())) {
             return false;
