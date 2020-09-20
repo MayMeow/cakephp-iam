@@ -35,7 +35,7 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function index()
-    {        
+    {
         $allUsers = $this->UserManager->getAll();
         
         // $this->_CurrentUser()->can('index', $allUsers);
