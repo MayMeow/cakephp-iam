@@ -24,4 +24,11 @@ class RoleManagerService extends AppService implements RoleManagerServiceInterfa
 
         return $this->Roles->Users->link($role, [$user]);
     }
+
+    public function removeFrom(int $userId, Role $role)
+    {
+        $user = $this->Users->get($userId);
+
+        return $this->Roles->Users->unlink($role, [$user]);
+    }
 }

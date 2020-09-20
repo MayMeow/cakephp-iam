@@ -118,21 +118,37 @@ class PoliciesController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
-    public function assign($id)
+    public function assign($id = null)
     {
         $policy = $this->Policies->get($id, [
             'contain' => ['Roles']
         ]);
 
         if ($this->request->is(['patch', 'post', 'put'])) {
-            //dd($this->request->getData('role_id'));
-
-            $this->PolicyManager->assignTo((int)$this->request->getData('role_id'), $policy);
+            if ($this->PolicyManager->assignTo((int)$this->request->getData('role_id'), $policy)) {
+                $this->Flash->success('OK');
+            } else {
+                $this->Flash->error('Something goes wrong');
+            }
         }
 
         $roles = $this->Policies->Roles->find('list');
         $assignForm = new AssignPolicyForm();
 
         $this->set(compact('policy', 'roles', 'assignForm'));
+    }
+
+    public function removeFrom($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $policy = $this->Policies->get($id);
+
+        if ($this->PolicyManager->removeFrom((int)$this->request->getData('role_id'),$policy)) {
+            $this->Flash->success('OK');
+        } else {
+            $this->Flash->error('Something goes wrong');
+        }
+
+        return $this->redirect($this->referer());
     }
 }

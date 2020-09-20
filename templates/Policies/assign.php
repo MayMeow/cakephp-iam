@@ -43,16 +43,22 @@
                 <?php foreach ($policy->roles as $role) :?>
                     <tr>
                         <td><?= $role->name ?></td>
+                        <td>
+                        <?= $this->Form->create($assignForm, ['url' => ['action' => 'removeFrom', $policy->id]]) ?>
+                            <?= $this->Form->control('role_id', ['type' => 'hidden', 'value' => $role->id]); ?>
+                            <?= $this->Form->button('Remove from policy') ?>
+                        <?= $this->Form->end() ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             </table>
 
-            <dov>
+            <div>
                 <?= $this->Form->create($assignForm) ?>
                     <?= $this->Form->control('role_id', ['options' => $roles]); ?>
                     <?= $this->Form->button('Assign') ?>
                 <?= $this->Form->end() ?>
-            </dov>
+            </div>
         </div>
     </div>
 </div>

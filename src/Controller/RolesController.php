@@ -5,11 +5,14 @@ namespace Iam\Controller;
 
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
+use Iam\Form\AssignRoleForm;
 
 /**
  * Roles Controller
  *
  * @property \Iam\Model\Table\RolesTable $Roles
+ * @property \Iam\Service\RoleManagerServiceInterface $RoleManager
+ * 
  * @method \Iam\Model\Entity\Role[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class RolesController extends AppController
@@ -19,6 +22,7 @@ class RolesController extends AppController
         parent::beforeFilter($event);
 
         $this->Authorization->skipAuthorization();
+        $this->loadService('Iam.RoleManager');
     }
 
     /**
@@ -111,5 +115,41 @@ class RolesController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function assign($id = null)
+    {
+        $role = $this->Roles->get($id, [
+            'contain' => ['Users']
+        ]);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            if ($this->RoleManager->assignTo((int)$this->request->getData('user_id'), $role)) {
+                $this->Flash->success('OK');
+            } else {
+                $this->Flash->error('Someting goes wrong');
+            }
+        }
+
+        $assignForm = new AssignRoleForm();
+
+        $users = $this->Roles->Users->find('list');
+
+        $this->set(compact('role', 'users', 'assignForm'));
+    }
+
+    public function removeFrom($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $role = $this->Roles->get($id);
+
+        if ($this->RoleManager->removeFrom((int)$this->request->getData('user_id'), $role))
+        {
+            $this->Flash->success('OK');
+        } else {
+            $this->Flash->error('Someting goes wrong');
+        }
+
+        return $this->redirect($this->referer());
     }
 }

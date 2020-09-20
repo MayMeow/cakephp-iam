@@ -35,9 +35,9 @@ class UserAuthorizationService extends AppService implements UserAuthorizationSe
         $policies = $this->Policies->find('all')
             ->matching('Roles', function ($q) use ($roles) {
                 return $q->where(['Roles.id IN' => array_keys($roles)]);
-            })->where(['Policies.name LIKE' => $policy]);
+            })->where(['Policies.normalized_name LIKE' => $policy]);
 
-        if (empty($policies)) {
+        if (empty($policies->first())) {
             return false;
         }
 

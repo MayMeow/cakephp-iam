@@ -24,4 +24,11 @@ class PolicyManagerService extends AppService implements PolicyManagerServiceInt
 
         return $this->Policies->Roles->link($policy, [$role]);
     }
+
+    public function removeFrom(int $roleId, Policy $policy)
+    {
+        $role = $this->Roles->get($roleId);
+
+        return $this->Policies->Roles->unlink($policy, [$role]);
+    }
 }

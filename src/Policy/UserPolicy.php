@@ -92,7 +92,9 @@ class UserPolicy
             //return true;
         }
 
-        if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), 'view:user')) {
+        //dd($this->UserAuthorization->hasPolicyTo($this->_getUser($user), 'IAM/USERS:VIEW'));
+
+        if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), 'IAM/USERS:VIEW')) {
             return true;
         }
 
