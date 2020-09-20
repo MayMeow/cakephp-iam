@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
 
 /**
@@ -13,6 +14,13 @@ use Iam\Controller\AppController;
  */
 class RolesController extends AppController
 {
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        $this->Authorization->skipAuthorization();
+    }
+
     /**
      * Index method
      *

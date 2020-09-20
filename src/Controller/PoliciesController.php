@@ -3,16 +3,29 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
+use Iam\Form\AssignPolicyForm;
 
 /**
  * Policies Controller
  *
  * @property \Iam\Model\Table\PoliciesTable $Policies
+ * @property \Iam\Service\PolicyManagerServiceInterface $PolicyManager
+ * 
  * @method \Iam\Model\Entity\Policy[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class PoliciesController extends AppController
 {
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        $this->Authorization->skipAuthorization();
+
+        $this->loadService('Iam.PolicyManager');
+    }
+
     /**
      * Index method
      *
@@ -103,5 +116,23 @@ class PoliciesController extends AppController
         }
 
         return $this->redirect(['action' => 'index']);
+    }
+
+    public function assign($id)
+    {
+        $policy = $this->Policies->get($id, [
+            'contain' => ['Roles']
+        ]);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            //dd($this->request->getData('role_id'));
+
+            $this->PolicyManager->assignTo((int)$this->request->getData('role_id'), $policy);
+        }
+
+        $roles = $this->Policies->Roles->find('list');
+        $assignForm = new AssignPolicyForm();
+
+        $this->set(compact('policy', 'roles', 'assignForm'));
     }
 }
