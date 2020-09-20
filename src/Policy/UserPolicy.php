@@ -11,6 +11,7 @@ use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\Locator\TableLocator;
 use Cake\ORM\ResultSet;
 use Cake\ORM\TableRegistry;
+use Iam\Builder\PolicyBuilder;
 use Iam\Model\Entity\User;
 
 /**
@@ -63,7 +64,11 @@ class UserPolicy
      */
     public function canEdit(IdentityInterface $user, User $resource)
     {
-        return $this->_getUser($user)->isAdmin();
+        if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), new PolicyBuilder(null, 'Iam', 'users', 'edit'))) {
+            return new Result(true);
+        }
+
+        return new Result(false);
     }
 
     /**
@@ -92,13 +97,11 @@ class UserPolicy
             //return true;
         }
 
-        //dd($this->UserAuthorization->hasPolicyTo($this->_getUser($user), 'IAM/USERS:VIEW'));
-
-        if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), 'IAM/USERS:VIEW')) {
-            return true;
+        if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), new PolicyBuilder(null, 'Iam', 'users', 'view'))) {
+            return new Result(true);
         }
 
-        return false;
+        return new Result(false);
     }
 
     /** 

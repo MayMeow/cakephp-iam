@@ -5,8 +5,11 @@ namespace Iam\Service;
 
 use App\Service\AppService;
 use Authentication\IdentityInterface;
+use Iam\Builder\PolicyBuilderInterface;
 
 /**
+ * Class UserAuthorizationService
+ * Authorizing users for requested actions
  * 
  * @property \Iam\Model\Table\PoliciesTable $Policies
  * @property \Iam\Model\Table\PoliciesRolesTable $Roles
@@ -19,17 +22,25 @@ class UserAuthorizationService extends AppService implements UserAuthorizationSe
         $this->loadModel('Iam.Policies');
     }
 
-    public function hasPolicyTo(IdentityInterface $user, string $policy) : bool
+    /**
+     * Method hasPolicyTo
+     * 
+     * Check if user has requested policy
+     * @param \Iam\Builder\PolicyBuilderInterface $policy Normalized name of policy
+     * @param \Authentication\IdentityInterface $user user object
+     */
+    public function hasPolicyTo(IdentityInterface $user, PolicyBuilderInterface $policy) : bool
     {
         $id = $user->getIdentifier();
 
+        // Using Deep Query @mdm
         // That should give you all policies that match the given policy name and are associated with the roles of the given user
         $policies = $this->Policies
             ->find()
             ->matching('Roles.Users', function($q) use($id) {
                 return $q->where(['Users.id' => $id]);
             })
-            ->where(['Policies.normalized_name' => $policy]);
+            ->where(['Policies.normalized_name' => $policy->getNormalizedName()]);
 
 
         /*
