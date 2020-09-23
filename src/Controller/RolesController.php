@@ -28,7 +28,7 @@ class RolesController extends AppController
         $this->loadService('Iam.RoleManager');
         $this->loadService('Iam.UserManager');
 
-        //$this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
+        $this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**
