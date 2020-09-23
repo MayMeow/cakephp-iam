@@ -18,6 +18,13 @@ class PolicyManagerService extends AppService implements PolicyManagerServiceInt
         $this->loadModel('Iam.Roles');
     }
 
+    public function getPolicyWithRoles(?int $id = null) : Policy
+    {
+        return $this->Policies->get($id, [
+            'contain' => ['Roles']
+        ]);
+    }
+
     public function assignTo(int $roleId, Policy $policy)
     {
         $role = $this->Roles->get($roleId);

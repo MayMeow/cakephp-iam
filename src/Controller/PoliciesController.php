@@ -12,6 +12,7 @@ use Iam\Form\AssignPolicyForm;
  *
  * @property \Iam\Model\Table\PoliciesTable $Policies
  * @property \Iam\Service\PolicyManagerServiceInterface $PolicyManager
+ * @property \Iam\Service\RoleManagerServiceInterface $RoleManager
  * 
  * @method \Iam\Model\Entity\Policy[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
@@ -24,6 +25,9 @@ class PoliciesController extends AppController
         $this->Authorization->skipAuthorization();
 
         $this->loadService('Iam.PolicyManager');
+        $this->loadService('Iam.RoleManager');
+
+        $this->viewBuilder()->setTheme('Ui');
     }
 
     /**
@@ -47,11 +51,12 @@ class PoliciesController extends AppController
      */
     public function view($id = null)
     {
-        $policy = $this->Policies->get($id, [
-            'contain' => [],
-        ]);
+        $policy = $this->PolicyManager->getPolicyWithRoles((int)$id);
 
-        $this->set(compact('policy'));
+        $assignForm = new AssignPolicyForm();
+        $roles = $this->RoleManager->getList();
+        
+        $this->set(compact('policy', 'assignForm', 'roles'));
     }
 
     /**
@@ -118,27 +123,27 @@ class PoliciesController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
+    /**
+     * Assign policy to role
+     */
     public function assign($id = null)
     {
-        $policy = $this->Policies->get($id, [
-            'contain' => ['Roles']
-        ]);
+        $this->request->allowMethod(['post', 'patch', 'put']);
+        $policy = $this->Policies->get($id);
 
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            if ($this->PolicyManager->assignTo((int)$this->request->getData('role_id'), $policy)) {
-                $this->Flash->success('OK');
-            } else {
-                $this->Flash->error('Something goes wrong');
-            }
+        if ($this->PolicyManager->assignTo((int)$this->request->getData('role_id'), $policy)) {
+            $this->Flash->success('OK');
+        } else {
+            $this->Flash->error('Something goes wrong');
         }
 
-        $roles = $this->Policies->Roles->find('list');
-        $assignForm = new AssignPolicyForm();
-
-        $this->set(compact('policy', 'roles', 'assignForm'));
+        return $this->redirect($this->referer());
     }
 
-    public function removeFrom($id = null)
+    /**
+     * Revoke policy from role
+     */
+    public function revoke($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $policy = $this->Policies->get($id);

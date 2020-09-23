@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Iam\Service;
 
 use App\Service\AppService;
+use Cake\ORM\Query;
 use Iam\Model\Entity\Role;
 
 /**
@@ -16,6 +17,11 @@ class RoleManagerService extends AppService implements RoleManagerServiceInterfa
     {
         $this->loadModel('Iam.Roles');
         $this->loadModel('Iam.Users');
+    }
+
+    public function getList() : Query
+    {
+        return $this->Roles->find('list');
     }
 
     public function assignTo(int $userId, Role $role)

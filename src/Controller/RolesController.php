@@ -23,6 +23,8 @@ class RolesController extends AppController
 
         $this->Authorization->skipAuthorization();
         $this->loadService('Iam.RoleManager');
+
+        $this->viewBuilder()->setTheme('Ui');
     }
 
     /**

@@ -38,5 +38,31 @@
                 </blockquote>
             </div>
         </div>
+
+        <div>
+            <h2>Roles with policy:</h2>
+
+            <table>
+                <?php foreach ($policy->roles as $role): ?>
+                    <tr>
+                        <td><?= $role->name ?></td>
+                        <td>
+                        <?= $this->Form->create($assignForm, ['url' => ['action' => 'revoke', $policy->id]]) ?>
+                            <?= $this->Form->control('role_id', ['type' => 'hidden', 'value' => $role->id]); ?>
+                            <?= $this->Form->button('Revoke') ?>
+                        <?= $this->Form->end() ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+
+        <div>
+            <?= $this->Form->create($assignForm, ['url' => ['action' => 'assign', $policy->id]]) ?>
+                <?= $this->Form->control('role_id', ['options' => $roles]); ?>
+                <?= $this->Form->button('Assign') ?>
+            <?= $this->Form->end() ?>
+        </div>
     </div>
+
 </div>
