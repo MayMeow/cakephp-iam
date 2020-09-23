@@ -5,6 +5,7 @@ namespace Iam\Controller;
 
 use Authorization\Exception\AuthorizationRequiredException;
 use Authorization\Exception\ForbiddenException;
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
 use Iam\Model\Entity\User;
@@ -27,6 +28,8 @@ class UsersController extends AppController
         $this->Authentication->addUnauthenticatedActions(['login', 'add']);
 
         $this->loadService('Iam.UserManager');
+
+        $this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**
@@ -35,7 +38,7 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function index()
-    {
+    {    
         $allUsers = $this->UserManager->getAll();
         
         // $this->_CurrentUser()->can('index', $allUsers);
