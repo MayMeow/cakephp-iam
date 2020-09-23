@@ -42,5 +42,31 @@
                 </blockquote>
             </div>
         </div>
+
+        <div>
+            <h2>Users ir role:</h2>
+
+            <table>
+                <?php foreach ($role->users as $user): ?>
+                    <tr>
+                        <td><?= $user->email ?></td>
+                        <td>
+                        <?= $this->Form->create($assignForm, ['url' => ['action' => 'revoke', $role->id]]) ?>
+                            <?= $this->Form->control('user_id', ['type' => 'hidden', 'value' => $user->id]); ?>
+                            <?= $this->Form->button('Revoke') ?>
+                        <?= $this->Form->end() ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+
+        <div>
+            <?= $this->Form->create($assignForm, ['url' => ['action' => 'assign', $role->id]]) ?>
+                <?= $this->Form->control('user_id', ['options' => $users]); ?>
+                <?= $this->Form->button('Assign') ?>
+            <?= $this->Form->end() ?>
+        </div>
+
     </div>
 </div>

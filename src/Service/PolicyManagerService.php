@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Iam\Service;
 
 use App\Service\AppService;
+use Cake\ORM\Query;
 use Iam\Model\Entity\Policy;
 
 /**
@@ -18,7 +19,12 @@ class PolicyManagerService extends AppService implements PolicyManagerServiceInt
         $this->loadModel('Iam.Roles');
     }
 
-    public function getPolicyWithRoles(?int $id = null) : Policy
+    public function getList(): Query
+    {
+        return $this->Policies->find('list');
+    }
+
+    public function getPolicyWithRoles(int $id = null) : Policy
     {
         return $this->Policies->get($id, [
             'contain' => ['Roles']

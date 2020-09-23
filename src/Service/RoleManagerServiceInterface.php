@@ -10,6 +10,8 @@ interface RoleManagerServiceInterface
 {
     public function getList() : Query;
 
+    public function getRoleWithUsers(int $id = null) : Role;
+
     public function assignTo(int $userId, Role $role);
     
     public function removeFrom(int $userId, Role $role);

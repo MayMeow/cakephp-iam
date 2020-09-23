@@ -24,6 +24,13 @@ class RoleManagerService extends AppService implements RoleManagerServiceInterfa
         return $this->Roles->find('list');
     }
 
+    public function getRoleWithUsers(int $id = null): Role
+    {
+        return $this->Roles->get($id, [
+            'contain' => ['Users'],
+        ]);
+    }
+
     public function assignTo(int $userId, Role $role)
     {
         $user = $this->Users->get($userId);

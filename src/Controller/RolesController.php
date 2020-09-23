@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
 use Iam\Form\AssignRoleForm;
@@ -12,6 +13,7 @@ use Iam\Form\AssignRoleForm;
  *
  * @property \Iam\Model\Table\RolesTable $Roles
  * @property \Iam\Service\RoleManagerServiceInterface $RoleManager
+ * @property \Iam\Service\UserManagerServiceInterface $UserManager
  * 
  * @method \Iam\Model\Entity\Role[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
@@ -22,9 +24,11 @@ class RolesController extends AppController
         parent::beforeFilter($event);
 
         $this->Authorization->skipAuthorization();
-        $this->loadService('Iam.RoleManager');
 
-        $this->viewBuilder()->setTheme('Ui');
+        $this->loadService('Iam.RoleManager');
+        $this->loadService('Iam.UserManager');
+
+        //$this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**
@@ -48,11 +52,12 @@ class RolesController extends AppController
      */
     public function view($id = null)
     {
-        $role = $this->Roles->get($id, [
-            'contain' => [],
-        ]);
+        $role = $this->RoleManager->getRoleWithUsers((int)$id);
 
-        $this->set(compact('role'));
+        $assignForm = new AssignRoleForm();
+        $users = $this->UserManager->getList();
+
+        $this->set(compact('role', 'assignForm', 'users'));
     }
 
     /**
@@ -121,26 +126,19 @@ class RolesController extends AppController
 
     public function assign($id = null)
     {
-        $role = $this->Roles->get($id, [
-            'contain' => ['Users']
-        ]);
+        $this->request->allowMethod(['post', 'put', 'patch']);
+        $role = $this->Roles->get($id);
 
-        if ($this->request->is(['patch', 'post', 'put'])) {
-            if ($this->RoleManager->assignTo((int)$this->request->getData('user_id'), $role)) {
-                $this->Flash->success('OK');
-            } else {
-                $this->Flash->error('Someting goes wrong');
-            }
+        if ($this->RoleManager->assignTo((int)$this->request->getData('user_id'), $role)) {
+            $this->Flash->success('OK');
+        } else {
+            $this->Flash->error('Someting goes wrong');
         }
 
-        $assignForm = new AssignRoleForm();
-
-        $users = $this->Roles->Users->find('list');
-
-        $this->set(compact('role', 'users', 'assignForm'));
+        return $this->redirect($this->referer());
     }
 
-    public function removeFrom($id = null)
+    public function revoke($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $role = $this->Roles->get($id);

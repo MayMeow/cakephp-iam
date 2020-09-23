@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
 use Iam\Form\AssignPolicyForm;
@@ -27,7 +28,7 @@ class PoliciesController extends AppController
         $this->loadService('Iam.PolicyManager');
         $this->loadService('Iam.RoleManager');
 
-        $this->viewBuilder()->setTheme('Ui');
+        $this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**

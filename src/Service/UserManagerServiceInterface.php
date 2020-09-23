@@ -4,11 +4,14 @@ declare(strict_types=1);
 namespace Iam\Service;
 
 use Authentication\IdentityInterface;
+use Cake\ORM\Query;
 use Iam\Model\Entity\User;
 use Iam\Model\Table\UsersTable;
 
 interface UserManagerServiceInterface
 {
+    public function getList() : Query;
+
     public function get(IdentityInterface $user) : User;
 
     public function getAll() : UsersTable;

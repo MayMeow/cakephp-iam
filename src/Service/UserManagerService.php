@@ -5,6 +5,7 @@ namespace Iam\Service;
 
 use App\Service\AppService;
 use Authentication\IdentityInterface;
+use Cake\ORM\Query;
 use Iam\Model\Entity\User;
 use Iam\Model\Table\UsersTable;
 
@@ -16,6 +17,11 @@ class UserManagerService extends AppService implements UserManagerServiceInterfa
     public function initialize()
     {
         $this->loadModel('Iam.Users');
+    }
+
+    public function getList(): Query
+    {
+        return $this->Users->find('list');
     }
 
     /**
