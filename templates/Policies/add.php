@@ -13,12 +13,14 @@
     </aside>
     <div class="column-responsive column-80">
         <div class="policies form content">
-            <?= $this->Form->create($policy) ?>
+            <?= $this->Form->create($policyForm) ?>
             <fieldset>
                 <legend><?= __('Add Policy') ?></legend>
                 <?php
-                    echo $this->Form->control('name');
-                    // echo $this->Form->control('normalized_name');
+                    echo $this->Form->control('prefix');
+                    echo $this->Form->control('plugin');
+                    echo $this->Form->control('controller');
+                    echo $this->Form->control('action');
                     echo $this->Form->control('description');
                 ?>
             </fieldset>

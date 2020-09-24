@@ -16,6 +16,8 @@ class PolicyBuilder implements PolicyBuilderInterface
     
     protected $action;
 
+    protected $descriptor = 'App.Policy/v1/';
+
     public function __construct(?string $prefix, ?string $plugin, string $controller, string $action)
     {
         $this->prefix = $prefix;
@@ -24,9 +26,22 @@ class PolicyBuilder implements PolicyBuilderInterface
         $this->action = $action;
     }
 
-    public function getNormalizedName()
+    public function getName(): string
     {
-        $policy_string = "app.policy/";
+        return $this->buildPolicyString();
+    }
+
+    public function getNormalizedName() :string
+    {
+        return strtoupper(Text::slug($this->buildPolicyString(), [
+            'replacement' => '_',
+            'preserve' => ":/@"
+        ]));
+    }
+
+    private function buildPolicyString() : string
+    {
+        $policy_string = $this->descriptor;
 
         if ($this->controller == null || $this->action == null) {
             throw new RuntimeException('Controller and Action are requred');
@@ -43,9 +58,6 @@ class PolicyBuilder implements PolicyBuilderInterface
         $policy_string .= $this->controller. "/";
         $policy_string .= $this->action;
 
-        return strtoupper(Text::slug($policy_string, [
-            'replacement' => '_',
-            'preserve' => ":/@"
-        ]));
+        return $policy_string;
     }
 }

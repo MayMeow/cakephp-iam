@@ -13,7 +13,7 @@
                 <tr>
                     <th><?= $this->Paginator->sort('id') ?></th>
                     <th><?= $this->Paginator->sort('name') ?></th>
-                    <th><?= $this->Paginator->sort('normalized_name') ?></th>
+                    <th><?= $this->Paginator->sort('description') ?></th>
                     <th class="actions"><?= __('Actions') ?></th>
                 </tr>
             </thead>
@@ -22,7 +22,7 @@
                 <tr>
                     <td><?= $this->Number->format($policy->id) ?></td>
                     <td><?= h($policy->name) ?></td>
-                    <td><?= h($policy->normalized_name) ?></td>
+                    <td><?= h($policy->description) ?></td>
                     <td class="actions">
                         <?= $this->Html->link(__('View'), ['action' => 'view', $policy->id]) ?>
                         <?= $this->Html->link(__('Edit'), ['action' => 'edit', $policy->id]) ?>

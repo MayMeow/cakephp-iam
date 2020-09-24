@@ -5,8 +5,10 @@ namespace Iam\Controller;
 
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
+use Iam\Builder\PolicyBuilder;
 use Iam\Controller\AppController;
 use Iam\Form\AssignPolicyForm;
+use Iam\Form\PolicyBuilderForm;
 
 /**
  * Policies Controller
@@ -28,7 +30,7 @@ class PoliciesController extends AppController
         $this->loadService('Iam.PolicyManager');
         $this->loadService('Iam.RoleManager');
 
-        $this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
+        //$this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**
@@ -68,8 +70,19 @@ class PoliciesController extends AppController
     public function add()
     {
         $policy = $this->Policies->newEmptyEntity();
+        $policyForm = new PolicyBuilderForm();
+
         if ($this->request->is('post')) {
-            $policy = $this->Policies->patchEntity($policy, $this->request->getData());
+
+            $pb = new PolicyBuilder(
+                $this->request->getData('prefix'),
+                $this->request->getData('plugin'),
+                $this->request->getData('controller'),
+                $this->request->getData('action'));
+
+            $policy->name = $pb->getName();
+            $policy->description = $this->request->getData('description');
+
             if ($this->Policies->save($policy)) {
                 $this->Flash->success(__('The policy has been saved.'));
 
@@ -77,7 +90,7 @@ class PoliciesController extends AppController
             }
             $this->Flash->error(__('The policy could not be saved. Please, try again.'));
         }
-        $this->set(compact('policy'));
+        $this->set(compact('policyForm'));
     }
 
     /**

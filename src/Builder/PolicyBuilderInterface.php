@@ -5,5 +5,7 @@ namespace Iam\Builder;
 
 interface PolicyBuilderInterface
 {
-    public function getNormalizedName();
+    public function getName() : string;
+
+    public function getNormalizedName() : string;
 }
