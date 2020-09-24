@@ -30,7 +30,7 @@ class PoliciesController extends AppController
         $this->loadService('Iam.PolicyManager');
         $this->loadService('Iam.RoleManager');
 
-        //$this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
+        $this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**

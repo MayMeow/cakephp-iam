@@ -6,6 +6,11 @@ namespace Iam\Builder;
 use Cake\Utility\Text;
 use RuntimeException;
 
+/**
+ * Policy builder
+ * 
+ * TODO Change this to PolicyStringBuilder / PolicyStringBuilderInterface
+ */
 class PolicyBuilder implements PolicyBuilderInterface
 {
     protected $prefix;
