@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Cake\Utility\Security;
 use Iam\Controller\AppController;
@@ -25,6 +26,8 @@ class AccessTokensController extends AppController
         $this->Authorization->skipAuthorization();
 
         $this->loadService('Iam.AccessTokenManager');
+
+        $this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**
@@ -34,10 +37,8 @@ class AccessTokensController extends AppController
      */
     public function index()
     {
-        $this->paginate = [
-            'contain' => ['Users'],
-        ];
-        $accessTokens = $this->paginate($this->AccessTokens);
+        // Show only tokens that belongs to currently authenticated user
+        $accessTokens = $this->paginate($this->AccessTokenManager->getAllForUser($this->Authentication->getIdentity()));
 
         $this->set(compact('accessTokens'));
     }
@@ -51,9 +52,7 @@ class AccessTokensController extends AppController
      */
     public function view($id = null)    
     {
-        $accessToken = $this->AccessTokens->get($id, [
-            'contain' => ['Users'],
-        ]);
+        $accessToken = $this->AccessTokenManager->getTokenWithUser((int)$id);
 
         $this->set(compact('accessToken'));
     }
