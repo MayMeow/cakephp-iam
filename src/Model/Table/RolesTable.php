@@ -7,6 +7,7 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Composer\DependencyResolver\Rule;
 
 /**
  * Roles Model
@@ -98,5 +99,12 @@ class RolesTable extends Table
             ->notEmptyString('uuid');
 
         return $validator;
+    }
+
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->isUnique(['normalized_name']), ['errorField' => 'normalized_name']);
+
+        return $rules
     }
 }

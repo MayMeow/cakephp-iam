@@ -75,4 +75,11 @@ class GroupsTable extends Table
 
         return $validator;
     }
+
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->isUnique(['normalized_name']), ['errorFIeld' => 'normalized_name']);
+
+        return $rules;
+    }
 }

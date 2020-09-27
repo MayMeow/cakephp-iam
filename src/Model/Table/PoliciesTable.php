@@ -84,4 +84,11 @@ class PoliciesTable extends Table
 
         return $validator;
     }
+
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        $rules->add($rules->isUnique(['normalized_name']), ['errorField' => 'normalized_name']);
+        
+        return $rules;
+    }
 }
