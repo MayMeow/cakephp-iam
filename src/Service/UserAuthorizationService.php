@@ -6,6 +6,7 @@ namespace Iam\Service;
 use App\Service\AppService;
 use Authentication\IdentityInterface;
 use Iam\Builder\PolicyBuilderInterface;
+use Iam\Builder\PolicyStringBuilderInterface;
 
 /**
  * Class UserAuthorizationService
@@ -26,10 +27,10 @@ class UserAuthorizationService extends AppService implements UserAuthorizationSe
      * Method hasPolicyTo
      * 
      * Check if user has requested policy
-     * @param \Iam\Builder\PolicyBuilderInterface $policy Normalized name of policy
+     * @param \Iam\Builder\PolicyStringBuilderInterface $policy Normalized name of policy
      * @param \Authentication\IdentityInterface $user user object
      */
-    public function hasPolicyTo(IdentityInterface $user, PolicyBuilderInterface $policy) : bool
+    public function hasPolicyTo(IdentityInterface $user, PolicyStringBuilderInterface $policy) : bool
     {
         $id = $user->getIdentifier();
 

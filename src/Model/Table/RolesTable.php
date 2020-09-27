@@ -105,6 +105,6 @@ class RolesTable extends Table
     {
         $rules->add($rules->isUnique(['normalized_name']), ['errorField' => 'normalized_name']);
 
-        return $rules
+        return $rules;
     }
 }
