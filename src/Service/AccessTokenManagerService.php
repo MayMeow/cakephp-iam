@@ -35,6 +35,9 @@ class AccessTokenManagerService extends AppService implements AccessTokenManager
 
     /**
      * Returns token with users that it belongs to
+     *
+     * @param int $id
+     * @return AccessToken
      */
     public function getTokenWithUser(int $id): AccessToken
     {
@@ -45,6 +48,10 @@ class AccessTokenManagerService extends AppService implements AccessTokenManager
 
     /**
      * Generate new token and store it to database
+     *
+     * @param ServerRequest $request
+     * @param IdentityInterface $user
+     * @return AccessToken|null
      */
     public function store(ServerRequest $request, IdentityInterface $user) : ?AccessToken
     {

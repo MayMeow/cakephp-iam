@@ -9,5 +9,10 @@ use Iam\Model\Entity\User;
 
 interface UserAuthorizationServiceInterface
 {
+    /**
+     * @param User $user
+     * @param PolicyStringBuilderInterface $policy
+     * @return bool
+     */
     public function hasPolicyTo(User $user, PolicyStringBuilderInterface $policy) : bool;
 }
