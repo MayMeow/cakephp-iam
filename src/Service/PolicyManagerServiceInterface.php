@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Service;
 
+use Cake\Http\ServerRequest;
 use Cake\ORM\Query;
 use Iam\Model\Entity\Policy;
 
@@ -32,4 +33,10 @@ interface PolicyManagerServiceInterface
      * @return mixed
      */
     public function removeFrom(int $roleId, Policy $policy);
+
+    /**
+     * @param ServerRequest $request
+     * @return mixed
+     */
+    public function create(ServerRequest $request);
 }

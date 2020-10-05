@@ -6,6 +6,7 @@ namespace Iam\Controller;
 use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Iam\Builder\PolicyBuilder;
+use Iam\Builder\PolicyStringBuilder;
 use Iam\Controller\AppController;
 use Iam\Form\AssignPolicyForm;
 use Iam\Form\PolicyBuilderForm;
@@ -16,7 +17,7 @@ use Iam\Form\PolicyBuilderForm;
  * @property \Iam\Model\Table\PoliciesTable $Policies
  * @property \Iam\Service\PolicyManagerServiceInterface $PolicyManager
  * @property \Iam\Service\RoleManagerServiceInterface $RoleManager
- * 
+ *
  * @method \Iam\Model\Entity\Policy[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class PoliciesController extends AppController
@@ -58,7 +59,7 @@ class PoliciesController extends AppController
 
         $assignForm = new AssignPolicyForm();
         $roles = $this->RoleManager->getList();
-        
+
         $this->set(compact('policy', 'assignForm', 'roles'));
     }
 
@@ -69,21 +70,11 @@ class PoliciesController extends AppController
      */
     public function add()
     {
-        $policy = $this->Policies->newEmptyEntity();
         $policyForm = new PolicyBuilderForm();
 
         if ($this->request->is('post')) {
 
-            $pb = new PolicyBuilder(
-                $this->request->getData('prefix'),
-                $this->request->getData('plugin'),
-                $this->request->getData('controller'),
-                $this->request->getData('action'));
-
-            $policy->name = $pb->getName();
-            $policy->description = $this->request->getData('description');
-
-            if ($this->Policies->save($policy)) {
+            if ($this->PolicyManager->create($this->request)) {
                 $this->Flash->success(__('The policy has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
