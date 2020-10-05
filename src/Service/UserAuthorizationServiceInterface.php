@@ -15,4 +15,10 @@ interface UserAuthorizationServiceInterface
      * @return bool
      */
     public function hasPolicyTo(User $user, PolicyStringBuilderInterface $policy) : bool;
+
+    /**
+     * @param \Iam\IdentityInterface|\Authentication\IdentityInterface|\Authorization\IdentityInterface $user
+     * @return bool
+     */
+    public function isAdministrator($user) : bool;
 }

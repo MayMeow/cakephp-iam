@@ -12,6 +12,7 @@ use Authorization\Policy\ResultInterface;
 use Cake\ORM\Entity;
 use Cake\ORM\Locator\LocatorAwareTrait;
 use Cake\ORM\TableRegistry;
+use Iam\IdentityInterface as IamIdentity;
 use phpDocumentor\Reflection\Types\This;
 
 /**
@@ -29,7 +30,7 @@ use phpDocumentor\Reflection\Types\This;
  *
  * @property \Iam\Model\Entity\Group $group
  */
-class User extends Entity implements AuthorizationIdentity, Authenticationidentity
+class User extends Entity implements AuthorizationIdentity, Authenticationidentity, IamIdentity
 {
     use LocatorAwareTrait;
 
@@ -158,10 +159,14 @@ class User extends Entity implements AuthorizationIdentity, Authenticationidenti
             ->matching('Roles', function($q) use ($roles) {
                 return $q->where(['Roles.id IN' => array_keys($roles)]);
             });
-        
+
         return $policies;
     }
 
+    /**
+     * @return bool
+     * @deprecated
+     */
     public function isAdmin() : bool
     {
         // Check if user is super admin
@@ -186,5 +191,25 @@ class User extends Entity implements AuthorizationIdentity, Authenticationidenti
         if (strlen($password) > 0) {
             return (new DefaultPasswordHasher())->hash($password);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsAdmin(): bool
+    {
+        if ($this->is_admin) {
+            return true;
+        }
+
+        return  false;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGroupIdentifier(): int
+    {
+        return $this->group_id;
     }
 }

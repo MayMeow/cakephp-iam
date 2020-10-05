@@ -16,27 +16,18 @@ use Iam\Model\Entity\User;
 
 /**
  * User policy
- * 
+ *
  * @property \Iam\Service\UserManagerServiceInterface $UserManager
  * @property \Iam\Service\UserAuthorizationServiceInterface $UserAuthorization
  */
-class UserPolicy
+class UserPolicy extends AppPolicy
 {
-    use LocatorAwareTrait;
-    use ServiceAwareTrait;
-
-    public function __construct()
-    {
-        $this->loadService('Iam.UserManager');
-        $this->loadService('Iam.UserAuthorization');
-    }
-
     /**
      * Check if $user can create User
      *
      * @param Authorization\IdentityInterface $user The user.
      * @param Iam\Model\Entity\User $resource
-     * @return bool
+     * @return bool|\Authorization\Policy\Result
      */
     public function canCreate(IdentityInterface $user, User $resource)
     {
@@ -52,7 +43,11 @@ class UserPolicy
      */
     public function canUpdate(IdentityInterface $user, User $resource)
     {
-        return $this->_getUser($user)->isAdmin();
+        if ($this->UserAuthorization->isAdministrator($user)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -60,10 +55,14 @@ class UserPolicy
      *
      * @param Authorization\IdentityInterface $user The user.
      * @param Iam\Model\Entity\User $resource
-     * @return bool
+     * @return bool|\Authorization\Policy\Result
      */
     public function canEdit(IdentityInterface $user, User $resource)
     {
+        if ($this->UserAuthorization->isAdministrator($user)) {
+            return new Result(true);
+        }
+
         if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), new PolicyBuilder(null, 'Iam', 'users', 'edit'))) {
             return new Result(true);
         }
@@ -80,7 +79,11 @@ class UserPolicy
      */
     public function canDelete(IdentityInterface $user, User $resource)
     {
-        return $this->_getUser($user)->isAdmin();
+        if ($this->UserAuthorization->isAdministrator($user)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -88,13 +91,13 @@ class UserPolicy
      *
      * @param Authorization\IdentityInterface $user The user.
      * @param Iam\Model\Entity\User $resource
-     * @return bool
+     * @return bool|\Authorization\Policy\Result
      */
     public function canView(IdentityInterface $user, User $resource)
     {
         // TODO uncomment after DONE
-        if ($this->_getUser($user)->isAdmin()) {
-            //return true;
+        if ($this->UserAuthorization->isAdministrator($user)) {
+            return true;
         }
 
         if ($this->UserAuthorization->hasPolicyTo($this->_getUser($user), new PolicyBuilder(null, 'Iam', 'users', 'view'))) {
@@ -102,15 +105,5 @@ class UserPolicy
         }
 
         return new Result(false);
-    }
-
-    /** 
-     * @param \Authorization\IdentityInterface $user.
-     */
-    protected function _getUser(IdentityInterface $user) : User
-    {
-        $u = $this->UserManager->get($user);
-
-        return $u;
     }
 }
