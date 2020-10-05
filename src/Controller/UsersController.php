@@ -169,7 +169,7 @@ class UsersController extends AppController
 
         if ($result->isValid()) {
             $redirect = $this->request->getQuery('redirect', [
-                'controller' => 'Users',
+                'controller' => 'Me',
                 'action' => 'index',
                 'plugin' => 'Iam'
             ]);

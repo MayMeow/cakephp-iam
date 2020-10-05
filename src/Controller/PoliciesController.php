@@ -26,8 +26,6 @@ class PoliciesController extends AppController
     {
         parent::beforeFilter($event);
 
-        $this->Authorization->skipAuthorization();
-
         $this->loadService('Iam.PolicyManager');
         $this->loadService('Iam.RoleManager');
 
@@ -41,7 +39,11 @@ class PoliciesController extends AppController
      */
     public function index()
     {
-        $policies = $this->paginate($this->Policies);
+        $allPolicies = $this->Policies;
+
+        $this->Authorization->authorize($allPolicies);
+
+        $policies = $this->paginate($allPolicies);
 
         $this->set(compact('policies'));
     }
@@ -57,6 +59,8 @@ class PoliciesController extends AppController
     {
         $policy = $this->PolicyManager->getPolicyWithRoles((int)$id);
 
+        $this->Authorization->authorize($policy);
+
         $assignForm = new AssignPolicyForm();
         $roles = $this->RoleManager->getList();
 
@@ -71,6 +75,8 @@ class PoliciesController extends AppController
     public function add()
     {
         $policyForm = new PolicyBuilderForm();
+
+        $this->Authorization->authorize($policyForm);
 
         if ($this->request->is('post')) {
 
@@ -96,6 +102,9 @@ class PoliciesController extends AppController
         $policy = $this->Policies->get($id, [
             'contain' => [],
         ]);
+
+        $this->Authorization->authorize($policy, 'Update');
+
         if ($this->request->is(['patch', 'post', 'put'])) {
             $policy = $this->Policies->patchEntity($policy, $this->request->getData());
             if ($this->Policies->save($policy)) {
@@ -119,6 +128,9 @@ class PoliciesController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $policy = $this->Policies->get($id);
+
+        $this->Authorization->authorize($policy);
+
         if ($this->Policies->delete($policy)) {
             $this->Flash->success(__('The policy has been deleted.'));
         } else {
@@ -136,6 +148,8 @@ class PoliciesController extends AppController
         $this->request->allowMethod(['post', 'patch', 'put']);
         $policy = $this->Policies->get($id);
 
+        $this->Authorization->authorize($policy);
+
         if ($this->PolicyManager->assignTo((int)$this->request->getData('role_id'), $policy)) {
             $this->Flash->success('OK');
         } else {
@@ -152,6 +166,8 @@ class PoliciesController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $policy = $this->Policies->get($id);
+
+        $this->Authorization->authorize($policy);
 
         if ($this->PolicyManager->removeFrom((int)$this->request->getData('role_id'),$policy)) {
             $this->Flash->success('OK');

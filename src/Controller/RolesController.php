@@ -14,7 +14,7 @@ use Iam\Form\AssignRoleForm;
  * @property \Iam\Model\Table\RolesTable $Roles
  * @property \Iam\Service\RoleManagerServiceInterface $RoleManager
  * @property \Iam\Service\UserManagerServiceInterface $UserManager
- * 
+ *
  * @method \Iam\Model\Entity\Role[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class RolesController extends AppController
@@ -22,8 +22,6 @@ class RolesController extends AppController
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-
-        $this->Authorization->skipAuthorization();
 
         $this->loadService('Iam.RoleManager');
         $this->loadService('Iam.UserManager');
@@ -38,7 +36,11 @@ class RolesController extends AppController
      */
     public function index()
     {
-        $roles = $this->paginate($this->Roles);
+        $allRoles = $this->Roles;
+
+        $this->Authorization->authorize($allRoles);
+
+        $roles = $this->paginate($allRoles);
 
         $this->set(compact('roles'));
     }
@@ -54,6 +56,8 @@ class RolesController extends AppController
     {
         $role = $this->RoleManager->getRoleWithUsers((int)$id);
 
+        $this->Authorization->authorize($role);
+
         $assignForm = new AssignRoleForm();
         $users = $this->UserManager->getList();
 
@@ -68,6 +72,9 @@ class RolesController extends AppController
     public function add()
     {
         $role = $this->Roles->newEmptyEntity();
+
+        $this->Authorization->authorize($role, 'Create');
+
         if ($this->request->is('post')) {
             $role = $this->Roles->patchEntity($role, $this->request->getData());
             if ($this->Roles->save($role)) {
@@ -92,6 +99,9 @@ class RolesController extends AppController
         $role = $this->Roles->get($id, [
             'contain' => [],
         ]);
+
+        $this->Authorization->authorize($role, 'Update');
+
         if ($this->request->is(['patch', 'post', 'put'])) {
             $role = $this->Roles->patchEntity($role, $this->request->getData());
             if ($this->Roles->save($role)) {
@@ -115,6 +125,9 @@ class RolesController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $role = $this->Roles->get($id);
+
+        $this->Authorization->authorize($role);
+
         if ($this->Roles->delete($role)) {
             $this->Flash->success(__('The role has been deleted.'));
         } else {
@@ -129,6 +142,8 @@ class RolesController extends AppController
         $this->request->allowMethod(['post', 'put', 'patch']);
         $role = $this->Roles->get($id);
 
+        $this->Authorization->authorize($role);
+
         if ($this->RoleManager->assignTo((int)$this->request->getData('user_id'), $role)) {
             $this->Flash->success('OK');
         } else {
@@ -142,6 +157,8 @@ class RolesController extends AppController
     {
         $this->request->allowMethod(['post', 'delete']);
         $role = $this->Roles->get($id);
+
+        $this->Authorization->authorize($role);
 
         if ($this->RoleManager->removeFrom((int)$this->request->getData('user_id'), $role))
         {

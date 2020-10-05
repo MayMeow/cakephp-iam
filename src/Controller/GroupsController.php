@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Iam\Controller;
 
+use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
 
@@ -17,9 +18,11 @@ class GroupsController extends AppController
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-        
+
         /** ! Remove after you have created default Group migration */
-        $this->Authentication->addUnauthenticatedActions(['add']);
+        // $this->Authentication->addUnauthenticatedActions(['add']);
+
+        $this->viewBuilder()->setTheme(Configure::read('Themes.backend'));
     }
 
     /**
@@ -29,7 +32,11 @@ class GroupsController extends AppController
      */
     public function index()
     {
-        $groups = $this->paginate($this->Groups);
+        $allGroups = $this->Groups;
+
+        $this->Authorization->authorize($allGroups);
+
+        $groups = $this->paginate($allGroups);
 
         $this->set(compact('groups'));
     }
@@ -57,9 +64,9 @@ class GroupsController extends AppController
      */
     public function add()
     {
-        $this->Authorization->skipAuthorization();
-        
         $group = $this->Groups->newEmptyEntity();
+        $this->Authorization->authorize($group);
+
         if ($this->request->is('post')) {
             $group = $this->Groups->patchEntity($group, $this->request->getData());
             if ($this->Groups->save($group)) {

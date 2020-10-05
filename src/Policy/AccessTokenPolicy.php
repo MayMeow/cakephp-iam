@@ -20,6 +20,7 @@ class AccessTokenPolicy
      */
     public function canCreate(IdentityInterface $user, AccessToken $accessToken)
     {
+        return false;
     }
 
     /**
@@ -31,6 +32,7 @@ class AccessTokenPolicy
      */
     public function canUpdate(IdentityInterface $user, AccessToken $accessToken)
     {
+        return false;
     }
 
     /**
@@ -42,6 +44,7 @@ class AccessTokenPolicy
      */
     public function canDelete(IdentityInterface $user, AccessToken $accessToken)
     {
+        return false;
     }
 
     /**
@@ -53,5 +56,6 @@ class AccessTokenPolicy
      */
     public function canView(IdentityInterface $user, AccessToken $accessToken)
     {
+        return false;
     }
 }
