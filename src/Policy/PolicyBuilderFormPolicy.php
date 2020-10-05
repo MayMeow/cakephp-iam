@@ -2,12 +2,12 @@
 
 namespace Iam\Policy;
 
-use Authorization\Identity;
+use Authorization\IdentityInterface;
 use Authorization\Policy\Result;
 
 class PolicyBuilderFormPolicy extends AppPolicy
 {
-    public function canAdd(Identity $user)
+    public function canAdd(IdentityInterface $user)
     {
         if ($this->UserAuthorization->isAdministrator($user)) {
             return new Result(true);

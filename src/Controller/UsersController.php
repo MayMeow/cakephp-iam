@@ -160,6 +160,9 @@ class UsersController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
+    /**
+     * @return \Cake\Http\Response|null
+     */
     public function login()
     {
         $this->Authorization->skipAuthorization();
@@ -182,6 +185,9 @@ class UsersController extends AppController
         }
     }
 
+    /**
+     * @return \Cake\Http\Response|null
+     */
     public function logout()
     {
         $this->Authorization->skipAuthorization();
