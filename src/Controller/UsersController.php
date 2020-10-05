@@ -15,7 +15,7 @@ use Iam\Model\Entity\User;
  *
  * @property \Iam\Model\Table\UsersTable $Users
  * @method \Iam\Model\Entity\User[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
- * 
+ *
  * @property \Iam\Service\UserManagerService $UserManager
  */
 class UsersController extends AppController
@@ -24,7 +24,7 @@ class UsersController extends AppController
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-        
+
         $this->Authentication->addUnauthenticatedActions(['login', 'add']);
 
         $this->loadService('Iam.UserManager');
@@ -38,9 +38,9 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      */
     public function index()
-    {    
+    {
         $allUsers = $this->UserManager->getAll();
-        
+
         // $this->_CurrentUser()->can('index', $allUsers);
         $this->Authorization->authorize($allUsers); // Uses UserTablePolicy
         //dd($this->request->getAttribute('identity')->can('index', $allUsers));
@@ -118,7 +118,7 @@ class UsersController extends AppController
         $user = $this->Users->get($id, [
             'contain' => [],
         ]);
-        
+
         try {
             $this->Authorization->authorize($user); // Uses UserEntityPolicy
         } catch (ForbiddenException $ex) {
