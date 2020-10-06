@@ -12,9 +12,9 @@ use Iam\Controller\AppController;
  * AccessTokens Controller
  *
  * @property \Iam\Model\Table\AccessTokensTable $AccessTokens
- * 
+ *
  * @property \Iam\Service\AccessTokenManagerServiceInterface $AccessTokenManager
- * 
+ *
  * @method \Iam\Model\Entity\AccessToken[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
  */
 class AccessTokensController extends AppController
@@ -50,7 +50,7 @@ class AccessTokensController extends AppController
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)    
+    public function view($id = null)
     {
         $accessToken = $this->AccessTokenManager->getTokenWithUser((int)$id);
 
@@ -66,6 +66,7 @@ class AccessTokensController extends AppController
     {
         $accessToken = $this->AccessTokens->newEmptyEntity();
         if ($this->request->is('post')) {
+
             if ($token = $this->AccessTokenManager->store($this->request, $this->Authentication->getIdentity())) {
                 $this->Flash->success(__('Your token was generated: {0} Save it somewhere save because you cannot display it next time.', $token->token_plain));
 
