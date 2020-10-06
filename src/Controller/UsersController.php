@@ -9,6 +9,7 @@ use Cake\Core\Configure;
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
 use Iam\Model\Entity\User;
+use Iam\ViewModel\UserIndexViewModel;
 
 /**
  * Users Controller
@@ -40,15 +41,28 @@ class UsersController extends AppController
     public function index()
     {
         $allUsers = $this->UserManager->getAll();
-
-        // $this->_CurrentUser()->can('index', $allUsers);
         $this->Authorization->authorize($allUsers); // Uses UserTablePolicy
-        //dd($this->request->getAttribute('identity')->can('index', $allUsers));
 
         $this->paginate = [
             'contain' => ['Groups'],
         ];
-        $users = $this->paginate($allUsers);
+        $usersData = $this->paginate($allUsers);
+
+        $users = [];
+        foreach ($usersData as $user) {
+            if ($user->id == $this->Authentication->getIdentity()->getIdentifier()) {
+                $active = true;
+            } else {
+                $active = false;
+            }
+
+            $users[] = new UserIndexViewModel(
+                (int)$user->id,
+                $user->email,
+                $user->group_id,
+                $user->group->name, $active, $user->is_admin, $user->created, $user->modified
+            );
+        }
 
         $this->set(compact('users'));
     }
@@ -203,7 +217,7 @@ class UsersController extends AppController
     /**
      * Returns current authenticated user
      */
-    private function _CurrentUser() : ?User
+    private function _CurrentUser(): ?User
     {
         return $this->request->getAttribute('identity');
     }
