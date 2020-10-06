@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Iam\ViewModel;
 
+use Authentication\IdentityInterface;
+use Cake\Datasource\ResultSetInterface;
 use Cake\I18n\FrozenTime;
 
 class UserIndexViewModel
@@ -27,7 +29,7 @@ class UserIndexViewModel
      * @param FrozenTime $created
      * @param FrozenTime $modified
      */
-    public function __construct(int $id, string $email, int $groupId, string $groupName, bool $isActive, bool $isAdmin, FrozenTime $created, FrozenTime $modified)
+    private function __construct(int $id, string $email, int $groupId, string $groupName, bool $isActive, bool $isAdmin, FrozenTime $created, FrozenTime $modified)
     {
         $this->id = $id;
         $this->email = $email;
@@ -181,5 +183,30 @@ class UserIndexViewModel
     {
         $this->isAdmin = $isAdmin;
         return $this;
+    }
+
+    /**
+     * Returns populated array f ViewModel
+     *
+     * @param \Cake\Datasource\ResultSetInterface|\Iam\Model\Entity\User[] $data
+     * @param IdentityInterface $identity
+     * @return array|\Iam\ViewModel\UserIndexViewModel[]
+     */
+    public static function prepare(ResultSetInterface $data, IdentityInterface $identity) : array
+    {
+        $model = [];
+
+        foreach ($data as $user) {
+            $active = $identity->getIdentifier() == $user->id;
+
+            $model[] = new UserIndexViewModel(
+                (int)$user->id,
+                $user->email,
+                $user->group_id,
+                $user->group->name, $active, $user->is_admin, $user->created, $user->modified
+            );
+        }
+
+        return $model;
     }
 }

@@ -48,21 +48,7 @@ class UsersController extends AppController
         ];
         $usersData = $this->paginate($allUsers);
 
-        $users = [];
-        foreach ($usersData as $user) {
-            if ($user->id == $this->Authentication->getIdentity()->getIdentifier()) {
-                $active = true;
-            } else {
-                $active = false;
-            }
-
-            $users[] = new UserIndexViewModel(
-                (int)$user->id,
-                $user->email,
-                $user->group_id,
-                $user->group->name, $active, $user->is_admin, $user->created, $user->modified
-            );
-        }
+        $users = UserIndexViewModel::prepare($usersData, $this->Authentication->getIdentity());
 
         $this->set(compact('users'));
     }
