@@ -4,14 +4,16 @@ declare(strict_types=1);
 namespace Iam\Controller;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ResultSetInterface;
 use Cake\Event\EventInterface;
 use Iam\Controller\AppController;
+use Iam\Model\Entity\Group;
 
 /**
  * Groups Controller
  *
  * @property \Iam\Model\Table\GroupsTable $Groups
- * @method \Iam\Model\Entity\Group[]|\Cake\Datasource\ResultSetInterface paginate($object = null, array $settings = [])
+ * @method Group[]|ResultSetInterface paginate($object = null, array $settings = [])
  */
 class GroupsController extends AppController
 {
